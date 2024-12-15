@@ -15,9 +15,9 @@ def load_model_artifacts():
     global model, tokenizer, max_len_seq
     
     # Paths for files in Kaggle
-    model_path = '/kaggle/working/model.h5'
-    tokenizer_path = '/kaggle/working/tokenizer.json'
-    config_path = '/kaggle/working/config.json'
+    model_path = 'model.h5'
+    tokenizer_path = 'tokenizer.json'
+    config_path = 'config.json'
     
     # Load the trained model
     model = tf.keras.models.load_model(model_path)
