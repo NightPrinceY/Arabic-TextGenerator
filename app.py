@@ -3,7 +3,6 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import json
-import os
 
 # Initialize global variables
 model = None
@@ -54,31 +53,58 @@ def generate_arabic_text(seed_text, num_words):
     except Exception as e:
         return f"Error generating text: {str(e)}"
 
+# Custom theme for the Arabic Text Generator
+custom_theme = gr.themes.Default().set(
+    button_primary_background="#4CAF50",
+    button_primary_color="#FFFFFF",
+    textbox_background="#FFFFFF",
+    slider_track_color="#2196F3",
+    slider_handle_color="#4CAF50"
+)
+
 # Create the Gradio interface
 iface = gr.Interface(
     fn=generate_arabic_text,
-    outputs=gr.Textbox(label="النص المُنتج"),
-    title="مولد نصوص بالعربية | Arbic text Generator with Hugging Face",
-    description="""استخدم الذكاء الاصطناعي لتوليد نصوص باللغة العربية! 
-                أدخل نصاً أولياً واختر عدد الكلمات التي تريد توليدها. 
-                سيتم توليد النص باللغة العربية بناءً على النص الأولي الذي أدخلته.""",
-   
     inputs=[
         gr.Textbox(
             label="أدخل النص الأولي الخاص بك",
             placeholder="ابدأ النص هنا...",
-            value="اه ماشي"
+            value="اه ماشي",
+            elem_id="input-text"
         ),
         gr.Slider(
             minimum=1,
             maximum=50,
             value=10,
             step=1,
-            label="عدد الكلمات المراد توليدها | Num of words"
+            label="عدد الكلمات المراد توليدها | Num of words",
+            elem_id="word-slider"
         )
     ],
-    
-    theme=gr.themes.Base()
+    outputs=gr.Textbox(label="النص المُنتج", elem_id="output-text"),
+    title="مولد النصوص بالعربية",
+    description="""استخدم الذكاء الاصطناعي لتوليد نصوص باللغة العربية! 
+                أدخل نصاً أولياً واختر عدد الكلمات التي تريد توليدها.""",
+    theme=custom_theme,
+    layout="horizontal",  # Arrange input and output side by side
+    css="""
+        #input-text, #output-text {
+            text-align: right;
+            direction: rtl;
+        }
+        #input-text {
+            background-color: #f5f5f5;
+            border: 2px solid #4CAF50;
+        }
+        #output-text {
+            background-color: #e8f5e9;
+            border: 2px solid #2196F3;
+        }
+        body {
+            background: linear-gradient(120deg, #fdfbfb, #ebedee);
+            font-family: 'Cairo', sans-serif;
+        }
+    """
 )
 
 # Launch the app
