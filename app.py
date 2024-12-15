@@ -61,18 +61,18 @@ iface = gr.Interface(
         gr.Textbox(
             label="أدخل النص الأولي الخاص بك",
             placeholder="ابدأ النص هنا...",
-            value="الحب هو"
+            value="اه ماشي"
         ),
         gr.Slider(
             minimum=1,
             maximum=50,
             value=10,
             step=1,
-            label="عدد الكلمات المراد توليدها"
+            label="عدد الكلمات المراد توليدها | Num of words"
         )
     ],
     outputs=gr.Textbox(label="النص المُنتج"),
-    title="مولد نصوص بالعربية",
+    title="مولد نصوص بالعربية | Arbic text Generator with Hugging Face",
     description="""استخدم الذكاء الاصطناعي لتوليد نصوص باللغة العربية! 
                 أدخل نصاً أولياً واختر عدد الكلمات التي تريد توليدها. 
                 سيتم توليد النص باللغة العربية بناءً على النص الأولي الذي أدخلته.""",
