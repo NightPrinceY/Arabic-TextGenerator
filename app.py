@@ -3,7 +3,6 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import json
-import os
 
 # Initialize global variables
 model = None
@@ -14,7 +13,7 @@ def load_model_artifacts():
     """Load model and tokenizer artifacts for Arabic text generation."""
     global model, tokenizer, max_len_seq
     
-    # Paths for files in Kaggle
+    # Paths for files in the current directory
     model_path = 'model.h5'
     tokenizer_path = 'tokenizer.json'
     config_path = 'config.json'
@@ -78,7 +77,7 @@ texts = {
     }
 }
 
-def get_interface(language="ar"):
+def create_interface(language="ar"):
     """Create a Gradio interface based on the selected language."""
     lang_texts = texts[language]
     rtl = "rtl" if language == "ar" else "ltr"
@@ -86,12 +85,6 @@ def get_interface(language="ar"):
     
     return gr.Interface(
         fn=generate_arabic_text,
-        outputs=gr.Textbox(
-            label=lang_texts["output_label"],
-            elem_id="output-textbox"
-        ),
-        title=lang_texts["title"],
-        description=lang_texts["description"],
         inputs=[
             gr.Textbox(
                 label=lang_texts["input_label"],
@@ -107,7 +100,13 @@ def get_interface(language="ar"):
                 label=lang_texts["num_words_label"]
             )
         ],
-        theme=gr.themes.Default(primary_hue="blue", secondary_hue="green", neutral_hue="slate"),
+        outputs=gr.Textbox(
+            label=lang_texts["output_label"],
+            elem_id="output-textbox"
+        ),
+        title=lang_texts["title"],
+        description=lang_texts["description"],
+        theme=gr.themes.Default(primary_hue="blue"),
         css=f"""
             #input-textbox textarea {{
                 text-align: {alignment};
@@ -124,36 +123,20 @@ def get_interface(language="ar"):
             }}
             
             body {{
-                background: linear-gradient(to right, #4facfe, #00f2fe);
                 font-family: 'Cairo', sans-serif;
-            }}
-            
-            .gr-button {{
-                background: #007bff;
-                color: white;
-                border-radius: 8px;
-                font-weight: bold;
+                background: linear-gradient(to right, #4facfe, #00f2fe);
             }}
         """
     )
 
-# Language toggle function
+# Language selection interface
 def toggle_language(lang):
     global iface
-    iface = get_interface(language=lang)
-    iface.launch(share=True)
+    iface = create_interface(language=lang)
+    iface.launch()
 
-# Initial interface
-iface = get_interface(language="ar")
+# Default to Arabic interface
+iface = create_interface(language="ar")
 
-# Launch the app
 if __name__ == "__main__":
-    with gr.Blocks() as demo:
-        gr.Markdown("# اختر اللغة | Choose Language")
-        gr.Row([
-            gr.Button("العربية").click(fn=lambda: toggle_language("ar")),
-            gr.Button("English").click(fn=lambda: toggle_language("en"))
-        ])
-        demo.append(iface)
-
-    demo.launch()
+    iface.launch()
