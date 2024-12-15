@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import json
+import os
 
 # Initialize global variables
 model = None
@@ -53,60 +54,106 @@ def generate_arabic_text(seed_text, num_words):
     except Exception as e:
         return f"Error generating text: {str(e)}"
 
-# Custom theme for the Arabic Text Generator
-custom_theme = gr.themes.Default().set(
-    button_primary_background="#4CAF50",
-    button_primary_color="#FFFFFF",
-    textbox_background="#FFFFFF",
-    slider_track_color="#2196F3",
-    slider_handle_color="#4CAF50"
-)
+# UI text for both languages
+texts = {
+    "ar": {
+        "title": "مولد نصوص بالعربية",
+        "description": """استخدم الذكاء الاصطناعي لتوليد نصوص باللغة العربية! 
+                        أدخل نصاً أولياً واختر عدد الكلمات التي تريد توليدها. 
+                        سيتم توليد النص باللغة العربية بناءً على النص الأولي الذي أدخلته.""",
+        "input_label": "أدخل النص الأولي الخاص بك",
+        "output_label": "النص المُنتج",
+        "num_words_label": "عدد الكلمات المراد توليدها",
+        "placeholder": "ابدأ النص هنا...",
+    },
+    "en": {
+        "title": "Arabic Text Generator",
+        "description": """Use AI to generate Arabic text! 
+                        Enter a seed text and choose the number of words to generate. 
+                        The text will be generated in Arabic based on the seed text you provide.""",
+        "input_label": "Enter your seed text",
+        "output_label": "Generated Text",
+        "num_words_label": "Number of Words to Generate",
+        "placeholder": "Start your text here...",
+    }
+}
 
-# Create the Gradio interface
-iface = gr.Interface(
-    fn=generate_arabic_text,
-    inputs=[
-        gr.Textbox(
-            label="أدخل النص الأولي الخاص بك",
-            placeholder="ابدأ النص هنا...",
-            value="اه ماشي",
-            elem_id="input-text"
+def get_interface(language="ar"):
+    """Create a Gradio interface based on the selected language."""
+    lang_texts = texts[language]
+    rtl = "rtl" if language == "ar" else "ltr"
+    alignment = "right" if language == "ar" else "left"
+    
+    return gr.Interface(
+        fn=generate_arabic_text,
+        outputs=gr.Textbox(
+            label=lang_texts["output_label"],
+            elem_id="output-textbox"
         ),
-        gr.Slider(
-            minimum=1,
-            maximum=50,
-            value=10,
-            step=1,
-            label="عدد الكلمات المراد توليدها | Num of words",
-            elem_id="word-slider"
-        )
-    ],
-    outputs=gr.Textbox(label="النص المُنتج", elem_id="output-text"),
-    title="مولد النصوص بالعربية",
-    description="""استخدم الذكاء الاصطناعي لتوليد نصوص باللغة العربية! 
-                أدخل نصاً أولياً واختر عدد الكلمات التي تريد توليدها.""",
-    theme=custom_theme,
-    layout="horizontal",  # Arrange input and output side by side
-    css="""
-        #input-text, #output-text {
-            text-align: right;
-            direction: rtl;
-        }
-        #input-text {
-            background-color: #f5f5f5;
-            border: 2px solid #4CAF50;
-        }
-        #output-text {
-            background-color: #e8f5e9;
-            border: 2px solid #2196F3;
-        }
-        body {
-            background: linear-gradient(120deg, #fdfbfb, #ebedee);
-            font-family: 'Cairo', sans-serif;
-        }
-    """
-)
+        title=lang_texts["title"],
+        description=lang_texts["description"],
+        inputs=[
+            gr.Textbox(
+                label=lang_texts["input_label"],
+                placeholder=lang_texts["placeholder"],
+                value="اه ماشي" if language == "ar" else "Hello",
+                elem_id="input-textbox"
+            ),
+            gr.Slider(
+                minimum=1,
+                maximum=50,
+                value=10,
+                step=1,
+                label=lang_texts["num_words_label"]
+            )
+        ],
+        theme=gr.themes.Default(primary_hue="blue", secondary_hue="green", neutral_hue="slate"),
+        css=f"""
+            #input-textbox textarea {{
+                text-align: {alignment};
+                direction: {rtl};
+                font-family: 'Cairo', sans-serif;
+                font-size: 18px;
+            }}
+            
+            #output-textbox textarea {{
+                text-align: {alignment};
+                direction: {rtl};
+                font-family: 'Cairo', sans-serif;
+                font-size: 18px;
+            }}
+            
+            body {{
+                background: linear-gradient(to right, #4facfe, #00f2fe);
+                font-family: 'Cairo', sans-serif;
+            }}
+            
+            .gr-button {{
+                background: #007bff;
+                color: white;
+                border-radius: 8px;
+                font-weight: bold;
+            }}
+        """
+    )
+
+# Language toggle function
+def toggle_language(lang):
+    global iface
+    iface = get_interface(language=lang)
+    iface.launch(share=True)
+
+# Initial interface
+iface = get_interface(language="ar")
 
 # Launch the app
 if __name__ == "__main__":
-    iface.launch()
+    with gr.Blocks() as demo:
+        gr.Markdown("# اختر اللغة | Choose Language")
+        gr.Row([
+            gr.Button("العربية").click(fn=lambda: toggle_language("ar")),
+            gr.Button("English").click(fn=lambda: toggle_language("en"))
+        ])
+        demo.append(iface)
+
+    demo.launch()
