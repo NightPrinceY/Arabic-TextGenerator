@@ -57,6 +57,12 @@ def generate_arabic_text(seed_text, num_words):
 # Create the Gradio interface
 iface = gr.Interface(
     fn=generate_arabic_text,
+    outputs=gr.Textbox(label="النص المُنتج"),
+    title="مولد نصوص بالعربية | Arbic text Generator with Hugging Face",
+    description="""استخدم الذكاء الاصطناعي لتوليد نصوص باللغة العربية! 
+                أدخل نصاً أولياً واختر عدد الكلمات التي تريد توليدها. 
+                سيتم توليد النص باللغة العربية بناءً على النص الأولي الذي أدخلته.""",
+   
     inputs=[
         gr.Textbox(
             label="أدخل النص الأولي الخاص بك",
@@ -71,12 +77,7 @@ iface = gr.Interface(
             label="عدد الكلمات المراد توليدها | Num of words"
         )
     ],
-    outputs=gr.Textbox(label="النص المُنتج"),
-    title="مولد نصوص بالعربية | Arbic text Generator with Hugging Face",
-    description="""استخدم الذكاء الاصطناعي لتوليد نصوص باللغة العربية! 
-                أدخل نصاً أولياً واختر عدد الكلمات التي تريد توليدها. 
-                سيتم توليد النص باللغة العربية بناءً على النص الأولي الذي أدخلته.""",
-   
+    
     theme=gr.themes.Base()
 )
 
